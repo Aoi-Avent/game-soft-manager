@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ゲームソフト管理アプリ</title>
+
+<style>
+body{
+font-family: Arial;
+margin:40px;
+}
+
+table{
+border-collapse: collapse;
+width:100%;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:8px;
+text-align:left;
+}
+
+button{
+margin-left:5px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>ゲームソフト管理アプリ</h2>
+
+<input id="name" placeholder="ゲームタイトル">
+<input id="reledate" type="date">
+
+<select id="gaming">
+<option value="">ゲーム機選択</option>
+<option value="ファミコン (NES)">ファミコン(NES)</option>
+<option value="PCエンジン (PCE)">PCエンジン(PCE)</option>
+<option value="メガドライブ [Genesis] (MD)">メガドライブ [Genesis] (MD)</option>
+<option value="スーパーファミコン (SNES)">スーパーファミコン(SNES)</option>
+<option value="ネオジオ・NEO-GEO">ネオジオ・NEO-GEO</option>
+<option value="メガCD (Sega CD)">メガCD (Sega CD)</option>
+<option value="スーパー32X (32X)">スーパー32X (32X)</option>
+<option value="CD-ROM2 / SUPER CD-ROM2">CD-ROM2/SUPER CD-ROM2</option>
+<option value="Play Station プレイステーション (PS1)">Play Station プレイステーション(PS1)</option>
+<option value="SEGA SATURN (SS)">SEGA SATURN (SS)</option>
+<option value="NINTENDO64 (N64)">NINTENDO64 (N64)</option>
+<option value="PC-FX">PC-FX</option>
+<option value="Dreamcast (DC)">Dreamcast (DC)</option>
+<option value="Play Station 2 (PS2)">Play Station 2 (PS2)</option>
+<option value="ニンテンドー ゲームキューブ (GC)">ニンテンドー ゲームキューブ (GC)</option>
+<option value="Xbox">Xbox</option>
+<option value="Xbox 360">Xbox 360</option>
+<option value="PlayStation 3 (PS3)">PlayStation 3 (PS3)</option>
+<option value="Wii">Wii</option>
+<option value="Wii U">Wii U</option>
+<option value="PlayStation 4 (PS4)">PlayStation 4 (PS4)</option>
+<option value="Xbox One">Xbox One</option>
+<option value="Nintendo Switch">Nintendo Switch</option>
+<option value="PC (Steam)">PC (Steam)</option>
+<option disabled>---携帯ゲーム機---</option>
+<option value="ゲームボーイ・カラー (GB / GBC)">ゲームボーイ・カラー (GB / GBC)</option>
+<option value="ゲームギア (GG)">ゲームギア (GG)</option>
+<option value="ネオジオポケット">ネオジオポケット</option>
+<option value="ゲームボーイアドバンス (GBA)">ゲームボーイアドバンス (GBA)</option>
+<option value="ワンダースワン">ワンダースワン</option>
+<option value="Nintendo DS (DS)">Nintendo DS (DS)</option>
+<option value="PlayStation Portable (PSP)">PlayStation Portable (PSP)</option>
+<option value="Nintendo 3DS (3DS)">Nintendo 3DS (3DS)</option>
+<option value="PlayStation Vita (PSV)">PlayStation Vita (PSV)</option>
+</select>
+
+<select id="genre">
+<option value="">ジャンル選択</option>
+<option value="ロールプレイング(RPG)">ロールプレイング(RPG)</option>
+<option value="アクション(ACT)">アクション(ACT)</option>
+<option value="アドベンチャー(ADV)">アドベンチャー(ADV)</option>
+<option value="シューティング(STG/SHT)">シューティング(STG/SHT)</option>
+<option value="シミュレーション(SLG/SIM)">シミュレーション(SLG/SIM)</option>
+<option value="パズル(PZL/PUZ)">パズル(PZL/PUZ)</option>
+<option value="スポーツ(SPG/SPT)">スポーツ(SPG/SPT)</option>
+<option value="レース(RCG/RCE)">レース(RCG/RCE)</option>
+<option value="音楽ゲーム">音楽ゲーム</option>
+</select>
+
+<input id="purchase" placeholder="購入金額">
+<input id="shop" placeholder="駿河屋">
+<input id="yahoo" placeholder="ヤフオク">
+
+<button onclick="addData()">追加</button>
+<button onclick="downloadCSV()">CSVダウンロード</button>
+
+<br><br>
+
+<input id="search" placeholder="検索..." onkeyup="render()">
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>タイトル</th>
+<th>発売日</th>
+<th>ゲーム機</th>
+<th>ジャンル</th>
+<th>購入金額</th>
+<th>駿河屋</th>
+<th>ヤフオク</th>
+<th>操作</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+<script>
+
+let db = JSON.parse(localStorage.getItem("db")) || [];
+const STEAM_SEED = ["FINAL FANTASY XIV Online", "Forza Horizon 5", "Pogostuck: Rage With Your Friends", "グランド・セフト・オートV レガシー", "Wallpaper Engine", "City Car Driving", "モンスターハンター：ワールド", "ARK: Survival Evolved", "モンスターハンターライズ", "Euro Truck Simulator 2", "Assetto Corsa", "タスクバーヒーロー", "Core Keeper", "Valheim", "エーペックスレジェンズ", "PUBG: BATTLEGROUNDS", "Sledding Game", "PowerWash Simulator", "Grand Piano Simulator", "biohazard HD REMASTER", "VRChat", "WRC Generations - The FIA WRC Official Game", "AION 2", "Secret Pie (Adult Version)", "Dark and Darker", "DEAD OR ALIVE Xtreme Venus Vacation [JP]", "Omega Strikers", "Breeders of the Nephelym", "theHunter: Call of the Wild™", "ウィッチャー３　ワイルドハント　リマスター", "ハートピアスローライフ", "グランド・セフト・オートV エンハンスト", "Bouncing DVD : The Game", "D1AL-ogue", "Gothic Girls", "ARK: Survival Of The Fittest", "Blender", "Counter-Strike 2", "Monster Girl Island: Prologue", "Mountain", "Once Human", "Our Casual Battlefield", "Palia", "Please, Touch The Artwork 2", "SUPER PEOPLE Testing Grounds", "Supermarket Together", "ゼンレスゾーンゼロ", "都市伝説解体センター 体験版", "欲望の王座"];
+try{
+if(!localStorage.getItem("seed_steam_v1")){
+let nextId = db.length ? Math.max(...db.map(d=>d.id))+1 : 1;
+const existing = new Set(db.map(d=>d.name));
+STEAM_SEED.forEach(n=>{
+if(!existing.has(n)){
+db.push({id:nextId++,name:n,reledate:"",gaming:"PC (Steam)",genre:"",purchase:0,shop:"",yahoo:""});
+}
+});
+localStorage.setItem("db",JSON.stringify(db));
+localStorage.setItem("seed_steam_v1","1");
+}
+}catch(e){console.error(e);}
+let idCounter = db.length ? Math.max(...db.map(d=>d.id))+1 : 1;
+
+function save(){
+localStorage.setItem("db",JSON.stringify(db));
+}
+
+function addData(){
+
+let name = document.getElementById("name").value.trim();
+let reledate = document.getElementById("reledate").value;
+let gaming = document.getElementById("gaming").value;
+let genre = document.getElementById("genre").value;
+let purchase = Number(document.getElementById("purchase").value) || 0;
+let shop = document.getElementById("shop").value;
+let yahoo = document.getElementById("yahoo").value;
+
+if(!name){
+alert("タイトルを入力してください");
+return;
+}
+
+db.push({
+id:idCounter++,
+name,
+reledate,
+gaming,
+genre,
+purchase,
+shop,
+yahoo
+});
+
+save();
+clearForm();
+render();
+}
+
+function clearForm(){
+document.getElementById("name").value="";
+document.getElementById("reledate").value="";
+document.getElementById("gaming").value="";
+document.getElementById("genre").value="";
+document.getElementById("purchase").value="";
+document.getElementById("shop").value="";
+document.getElementById("yahoo").value="";
+}
+
+function deleteData(id){
+if(confirm("削除しますか？")){
+db = db.filter(d=>d.id!==id);
+save();
+render();
+}
+}
+
+function editData(id){
+
+let item = db.find(d=>d.id===id);
+
+let newName = prompt("タイトル", item.name);
+if(newName === null) return;
+
+item.name = newName;
+item.reledate = prompt("発売日", item.reledate) || "";
+item.gaming = prompt("ゲーム機", item.gaming) || "";
+item.genre = prompt("ジャンル", item.genre) || "";
+item.purchase = Number(prompt("購入金額", item.purchase)) || 0;
+item.shop = prompt("駿河屋", item.shop) || "";
+item.yahoo = prompt("ヤフオク", item.yahoo) || "";
+
+save();
+render();
+}
+
+function render(){
+
+let keyword = document.getElementById("search").value.toLowerCase();
+let body = document.getElementById("tableBody");
+
+body.innerHTML = "";
+
+let sorted = [...db].sort((a,b)=>
+(a.reledate||"").localeCompare(b.reledate||"")
+);
+
+sorted
+.filter(d =>
+d.name.toLowerCase().includes(keyword) ||
+(d.gaming && d.gaming.toLowerCase().includes(keyword)) ||
+(d.genre && d.genre.toLowerCase().includes(keyword))
+)
+.forEach(d => {
+
+let row = document.createElement("tr");
+
+row.innerHTML = `
+<td>${d.id}</td>
+<td>${String(d.name).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td>
+<td>${d.reledate || ""}</td>
+<td>${d.gaming || ""}</td>
+<td>${d.genre || ""}</td>
+<td>${d.purchase.toLocaleString()}円</td>
+<td>${d.shop || ""}</td>
+<td>${d.yahoo || ""}</td>
+<td>
+<button onclick="editData(${d.id})">編集</button>
+<button onclick="deleteData(${d.id})">削除</button>
+</td>
+`;
+
+body.appendChild(row);
+
+});
+
+}
+
+function downloadCSV(){
+
+let csv="ID,タイトル,発売日,ゲーム機,ジャンル,購入金額,駿河屋,ヤフオク\n";
+
+db.forEach(d=>{
+csv+=`${d.id},"${d.name}",${d.reledate},${d.gaming},${d.genre},${d.purchase},${d.shop},${d.yahoo}\n`;
+});
+
+let blob = new Blob(["\uFEFF"+csv],{type:"text/csv"});
+let link = document.createElement("a");
+
+link.href = URL.createObjectURL(blob);
+link.download = "game_data.csv";
+link.click();
+}
+
+render();
+
+</script>
+
+</body>
+</html>
